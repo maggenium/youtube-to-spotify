@@ -11,6 +11,7 @@ import os
 
 scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 
+
 class MainApp(App):
     def build(self):
 
@@ -32,7 +33,35 @@ class MainApp(App):
         )
         response = request.execute()
 
-        self.label = Label()
+        # fetch uploads playlist id
+        content_details = response['items'][0]['contentDetails']
+        uploads_playlist_id = content_details['relatedPlaylists']['uploads']
+
+        # fetch uploads playlistItems
+        request = youtube.playlistItems().list(
+            part="snippet",
+            playlistId=uploads_playlist_id,
+            maxResults=20
+        )
+        response = request.execute()
+        
+        playlist_items = response['items']
+        video_titles = []
+        # print video titles
+        for i in range(len(playlist_items)):
+            video_titles.append(str(playlist_items[i]['snippet']['title']) + '\n')
+
+        self.window = GridLayout()
+        self.window.cols = 1
+        self.window.size_hint = (0.6, 0.7)
+        self.window.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+
+        label_str = '\n'.join(video_titles)
+        self.label = Label(text=label_str,
+                           font_size=18,
+                           color='orange'
+        )
+        self.window.add_widget(self.label)
 
         return self.window
 
