@@ -1,0 +1,5 @@
+# VSCode
+*.code-workspace
+
+# Read Me
+**/README.md
